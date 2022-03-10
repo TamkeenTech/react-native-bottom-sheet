@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Sheet } from 'react-native-bottom-sheet';
 import { Block, Label, Paragraph } from '../placeholder';
 
 export const DefaultSheet = () => {
   return (
-    <Sheet contentContainerStyle={{ paddingHorizontal: 10 }}>
+    <Sheet contentContainerStyle={{ paddingHorizontal: 15 }}>
       <View>
         <Label />
         <Paragraph />

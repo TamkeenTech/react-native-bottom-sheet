@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export const Block = ({ style }) => {
+interface BlockProps {
+  style?: any;
+}
+
+export const Block: FC<BlockProps> = ({ style }) => {
   return <View style={[styles.block, style]} />;
 };
 

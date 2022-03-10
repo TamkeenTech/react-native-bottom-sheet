@@ -17,7 +17,9 @@ export default function App() {
 const styles = StyleSheet.create({
   text: {
     fontSize: 18,
-    color: '#999',
+    color: '#d3d3d3',
+    letterSpacing: 1,
+    fontWeight: 'bold',
     marginBottom: 200,
   },
   container: {

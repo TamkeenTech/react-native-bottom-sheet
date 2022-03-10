@@ -14,7 +14,7 @@ import { DefaultHeader } from '../core';
 
 const BOUNCE_BOTTOM_PADDING = 20;
 
-interface SheetProps {
+export interface SheetProps {
   childOffset?: number;
   offset?: number;
   onUpdate?: Function;

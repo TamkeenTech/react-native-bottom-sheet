@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export const Paragraph = ({ style, num = 2 }) => {
+interface ParagraphProps {
+  num?: number;
+  style?: any;
+}
+
+export const Paragraph: FC<ParagraphProps> = ({ style, num = 2 }) => {
   return (
     <View style={[styles.container, style]}>
       {new Array(num).fill(1).map((_, index) => (
