@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Sheet } from 'react-native-bottom-sheet';
+import { Sheet } from '@tamkeentech/react-native-bottom-sheet';
 import { Block, Label, Paragraph } from '../placeholder';
 
 export const DefaultSheet = () => {

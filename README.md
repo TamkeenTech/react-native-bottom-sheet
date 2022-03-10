@@ -58,14 +58,14 @@ export const DefaultSheet = () => {
 
 ## API
 
-| Props                     | Type     | Description                                                 | Default                                           |
-| ------------------------- | -------- | ----------------------------------------------------------- | ------------------------------------------------- |
-| offset                    | number   | A padding area to be set at the bottom of the sheet         | 0                                                 |
-| childOffset               | number   | A bottom offset area to be set for each direct child        | 0                                                 |
-| onUpdate                  | function | A callback function excuted when the user removes his touch |                                                   |
-| SheetHeaderComponent      | function | A custom header component for the sheet                     | Default header component shipped with the library |
-| SheetHeaderComponentStyle | object   |                                                             |                                                   |
-| style                     | object   |                                                             |                                                   |
+| Props                     | Type     | Description                                                  | Default                                           |
+| ------------------------- | -------- | ------------------------------------------------------------ | ------------------------------------------------- |
+| offset                    | number   | An extra translate area to be set at the bottom of the sheet | 0                                                 |
+| childOffset               | number   | A bottom offset area to be set for each direct child         | 0                                                 |
+| onUpdate                  | function | A callback function excuted when the user removes his touch  |                                                   |
+| SheetHeaderComponent      | function | A custom header component for the sheet                      | Default header component shipped with the library |
+| SheetHeaderComponentStyle | object   |                                                              |                                                   |
+| style                     | object   |                                                              |                                                   |
 
 ## Contributing
 
