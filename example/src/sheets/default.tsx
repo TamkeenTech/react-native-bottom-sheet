@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Sheet } from 'react-native-bottom-sheet';
 import { Block, Label, Paragraph } from '../placeholder';
 
