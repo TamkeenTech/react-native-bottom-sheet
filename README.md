@@ -2,6 +2,10 @@
 
 A simple react native package for creating and using different kind of modals
 
+## Example
+
+![Screen Record of a default sheet](https://github.com/TamkeenTech/react-native-bottom-sheet/blob/master/example/screenshots/default_sheet.gif?raw=true)
+
 ## Installation
 
 1. Install **react-native-reanimatad 2**, for installation instructions please follow the below link:
