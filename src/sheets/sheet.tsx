@@ -20,8 +20,8 @@ export interface SheetProps {
   onUpdate?: Function;
   style?: any;
   contentContainerStyle?: any;
-  ModalHeaderComponentStyle?: any;
-  ModalHeaderComponent?: any;
+  SheetHeaderComponentStyle?: any;
+  SheetHeaderComponent?: any;
   children: Array<Element>;
 }
 
@@ -32,8 +32,8 @@ export const Sheet: FC<SheetProps> = ({
   contentContainerStyle,
   style,
   onUpdate,
-  ModalHeaderComponent = DefaultHeader,
-  ModalHeaderComponentStyle,
+  SheetHeaderComponent = DefaultHeader,
+  SheetHeaderComponentStyle,
 }) => {
   const y = useSharedValue(DIMENSIONS.HEIGHT);
   const [max_height, setMaxHeight] = useState(DIMENSIONS.HEIGHT);
@@ -144,12 +144,12 @@ export const Sheet: FC<SheetProps> = ({
   return (
     <PanGestureHandler onGestureEvent={eventHandler}>
       <Animated.View style={[styles.modal, style, animatedStyle]}>
-        {ModalHeaderComponent ? (
+        {SheetHeaderComponent ? (
           <View
-            style={[styles.header, ModalHeaderComponentStyle]}
+            style={[styles.header, SheetHeaderComponentStyle]}
             onLayout={onHeaderLayout}
           >
-            <ModalHeaderComponent toggleModal={toggleModal} opened={opened} />
+            <SheetHeaderComponent toggleModal={toggleModal} opened={opened} />
           </View>
         ) : null}
         <View
