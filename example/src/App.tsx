@@ -1,27 +1,30 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-bottom-sheet';
+import { DefaultSheet } from './sheets/default';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
-
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
+  React.useEffect(() => {}, []);
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text style={styles.text}>React Native Bottom Sheet</Text>
+      <DefaultSheet />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: 18,
+    color: '#999',
+    marginBottom: 200,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#F2F2F2',
   },
   box: {
     width: 60,
