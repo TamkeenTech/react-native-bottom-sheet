@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
+import { FullSheet } from './sheets';
 import { DefaultSheet } from './sheets/default';
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
     <View style={styles.container}>
       <Text style={styles.text}>React Native Bottom Sheet</Text>
       <DefaultSheet />
+      {/* <FullSheet /> */}
     </View>
   );
 }
