@@ -3,12 +3,15 @@ import { TouchableOpacity, View } from 'react-native';
 import Animated, {
   interpolate,
   runOnJS,
+  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { DefaultHeader } from '../core';
 import { css, DIMENSIONS } from '../constants';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 
 export interface FullSheetProps {
   offset?: number;
@@ -74,32 +77,68 @@ export const FullSheet: FC<FullSheetProps> = ({
     setTranslateY(DIMENSIONS.HEIGHT - height);
   }, []);
 
+  const eventContainerHandler = useAnimatedGestureHandler({
+    onActive: (event: any) => {
+      y.value = Math.max(translate_y + event.translationY, translate_y - 30);
+    },
+    onEnd: (event) => {
+      const { translationY } = event;
+      y.value = withSpring(translate_y);
+      // if (translationY > 20) {
+      //   opacity.value = withTiming(0, { duration: 500 }, () =>
+      //     runOnJS(onClose)()
+      //   );
+      //   y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
+      // }
+    },
+  });
+
+  const eventSheetHandler = useAnimatedGestureHandler({
+    onActive: (event: any) => {
+      y.value = Math.max(translate_y + event.translationY, translate_y - 30);
+    },
+    onEnd: (event) => {
+      const { translationY } = event;
+      y.value = withSpring(translate_y);
+      if (translationY > 20) {
+        opacity.value = withTiming(0, { duration: 500 }, () =>
+          runOnJS(onClose)()
+        );
+        y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
+      }
+    },
+  });
+
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          transform: [{ translateY: visible ? 0 : DIMENSIONS.HEIGHT }],
-        },
-      ]}
-    >
-      <TouchableOpacity
-        activeOpacity={1}
-        style={styles.dim_container}
-        onPress={close}
+    <PanGestureHandler onGestureEvent={eventContainerHandler}>
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            transform: [{ translateY: visible ? 0 : DIMENSIONS.HEIGHT }],
+          },
+        ]}
       >
-        <Animated.View style={[styles.dim, dim_animated_style]} />
-      </TouchableOpacity>
-      <Animated.View style={[styles.sheet, sheet_animated_style]}>
-        <View onLayout={_onLayout}>
-          <SheetHeaderComponent style={SheetHeaderComponentStyle} />
-          <View style={[styles.content, contentContainerStyle]}>
-            {children}
-          </View>
-        </View>
-        <View style={styles.filler} />
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.dim_container}
+          onPress={close}
+        >
+          <Animated.View style={[styles.dim, dim_animated_style]} />
+        </TouchableOpacity>
+        <PanGestureHandler onGestureEvent={eventSheetHandler}>
+          <Animated.View style={[styles.sheet, sheet_animated_style]}>
+            <View onLayout={_onLayout}>
+              <SheetHeaderComponent style={SheetHeaderComponentStyle} />
+              <View style={[styles.content, contentContainerStyle]}>
+                {children}
+              </View>
+            </View>
+            <View style={styles.filler} />
+          </Animated.View>
+        </PanGestureHandler>
       </Animated.View>
-    </View>
+    </PanGestureHandler>
   );
 };
 

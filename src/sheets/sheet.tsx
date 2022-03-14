@@ -100,6 +100,8 @@ export const Sheet: FC<SheetProps> = ({
         height: closest.height,
         is_end_reached,
       });
+      // RUN SIDE EFFECTS
+
       let new_value = DIMENSIONS.HEIGHT - closest.height;
       closest.index &&
         closest.index + 1 !== breakpoints.length &&

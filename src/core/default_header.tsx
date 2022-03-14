@@ -39,6 +39,6 @@ const styles = css({
     height: 6,
     borderRadius: 4,
     width: 60,
-    backgroundColor: '#99999911',
+    backgroundColor: '#99999944',
   },
 });
