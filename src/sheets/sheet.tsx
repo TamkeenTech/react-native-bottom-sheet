@@ -191,6 +191,7 @@ const styles = css({
     position: 'absolute',
     minHeight: '100%',
     width: '100%',
+    zIndex: 1,
   },
   header: {
     top: 2,

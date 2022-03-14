@@ -16,36 +16,40 @@ export interface FullSheetProps {
   show?: boolean;
   onClose?: Function;
   SheetHeaderComponentStyle?: any;
+  contentContainerStyle?: any;
   SheetHeaderComponent?: any;
   children: Array<Element>;
 }
 
 export const FullSheet: FC<FullSheetProps> = ({
-  offset = 300,
+  offset = 0,
   dim = 0.8,
   show,
-  onClose,
+  onClose: onCloseProps,
   SheetHeaderComponent = DefaultHeader,
+  contentContainerStyle,
   SheetHeaderComponentStyle,
   children,
 }) => {
-  const translate_y = DIMENSIONS.HEIGHT - offset;
   const [visible, setVisible] = useState(show);
   const opacity = useSharedValue(show ? 1 : 0);
-  const y = useSharedValue(show ? translate_y : DIMENSIONS.HEIGHT);
+  const y = useSharedValue(DIMENSIONS.HEIGHT);
+  const [translate_y, setTranslateY] = useState(0);
+
+  const onClose = useCallback(() => {
+    setVisible(false);
+    onCloseProps && onCloseProps();
+  }, [onCloseProps]);
 
   const close = useCallback(() => {
-    opacity.value = withTiming(0, { duration: 500 }, () =>
-      runOnJS(setVisible)(false)
-    );
+    opacity.value = withTiming(0, { duration: 500 }, () => runOnJS(onClose)());
     y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
-    onClose && onClose();
   }, [onClose, opacity, y]);
 
   const open = useCallback(() => {
     opacity.value = withTiming(1, { duration: 500 });
-    y.value = withTiming(translate_y, { duration: 500 });
-  }, [opacity, translate_y, y]);
+    y.value = withTiming(translate_y - offset, { duration: 500 });
+  }, [opacity, translate_y, offset, y]);
 
   useEffect(() => {
     show ? setVisible(true) : close();
@@ -65,8 +69,20 @@ export const FullSheet: FC<FullSheetProps> = ({
     transform: [{ translateY: y.value }],
   }));
 
+  const _onLayout = useCallback(({ nativeEvent }) => {
+    const { height } = nativeEvent.layout;
+    setTranslateY(DIMENSIONS.HEIGHT - height);
+  }, []);
+
   return (
-    <View style={[styles.container, { height: visible ? '100%' : 0 }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          transform: [{ translateY: visible ? 0 : DIMENSIONS.HEIGHT }],
+        },
+      ]}
+    >
       <TouchableOpacity
         activeOpacity={1}
         style={styles.dim_container}
@@ -75,8 +91,13 @@ export const FullSheet: FC<FullSheetProps> = ({
         <Animated.View style={[styles.dim, dim_animated_style]} />
       </TouchableOpacity>
       <Animated.View style={[styles.sheet, sheet_animated_style]}>
-        <SheetHeaderComponent style={SheetHeaderComponentStyle} />
-        <View style={styles.content}>{children}</View>
+        <View onLayout={_onLayout}>
+          <SheetHeaderComponent style={SheetHeaderComponentStyle} />
+          <View style={[styles.content, contentContainerStyle]}>
+            {children}
+          </View>
+        </View>
+        <View style={styles.filler} />
       </Animated.View>
     </View>
   );
@@ -86,7 +107,9 @@ const styles = css({
   container: {
     top: 0,
     width: '100%',
+    height: '100%',
     position: 'absolute',
+    zIndex: 1,
   },
   dim_container: {
     flex: 1,
@@ -106,7 +129,11 @@ const styles = css({
     height: '100%',
   },
   content: {
+    paddingBottom: 20,
     backgroundColor: 'white',
-    minHeight: '100%',
+  },
+  filler: {
+    flex: 1,
+    backgroundColor: 'white',
   },
 });
