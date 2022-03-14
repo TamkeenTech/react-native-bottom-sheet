@@ -6,6 +6,7 @@ import Animated, {
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withSpring,
 } from 'react-native-reanimated';
 import { css, DIMENSIONS, STATUSBAR_HEIGHT } from '../constants';
@@ -23,6 +24,7 @@ export interface SheetProps {
   SheetHeaderComponentStyle?: any;
   SheetHeaderComponent?: any;
   children: Array<Element>;
+  delay?: number;
 }
 
 export const Sheet: FC<SheetProps> = ({
@@ -34,6 +36,7 @@ export const Sheet: FC<SheetProps> = ({
   onUpdate,
   SheetHeaderComponent = DefaultHeader,
   SheetHeaderComponentStyle,
+  delay = 0,
 }) => {
   const y = useSharedValue(DIMENSIONS.HEIGHT);
   const [max_height, setMaxHeight] = useState(DIMENSIONS.HEIGHT);
@@ -127,9 +130,12 @@ export const Sheet: FC<SheetProps> = ({
     (index, height) => {
       /* INIT MODAL */
       if (!index && breakpoints[index] === 1) {
-        y.value = withSpring(Math.round(DIMENSIONS.HEIGHT - height), {
-          damping: 13,
-        });
+        y.value = withDelay(
+          delay,
+          withSpring(Math.round(DIMENSIONS.HEIGHT - height), {
+            damping: 13,
+          })
+        );
       }
       setBreakPoints((prev) =>
         prev.map((val, i) => (index === i ? height : val))
