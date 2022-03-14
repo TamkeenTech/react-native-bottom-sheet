@@ -2,9 +2,9 @@
 
 A simple react native package for creating and using different kind of modals
 
-## Example
+## Examples
 
-![Screen Record of a default sheet](https://github.com/TamkeenTech/react-native-bottom-sheet/blob/master/example/screenshots/default_sheet.gif?raw=true)
+![Screen Record of the default sheet](https://github.com/TamkeenTech/react-native-bottom-sheet/blob/master/example/screenshots/sheet.gif?raw=true) ![Screen Record of a sticky sheet](https://github.com/TamkeenTech/react-native-bottom-sheet/blob/master/example/screenshots/sticky_sheet.gif?raw=true)
 
 ## Installation
 
