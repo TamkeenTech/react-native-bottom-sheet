@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Default, FullSheet, Main } from './screens';
+import { StickyScreen, Default, Main } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -15,8 +15,8 @@ export default function App() {
         initialRouteName="main"
       >
         <Stack.Screen name="main" component={Main} />
+        <Stack.Screen name="sticky" component={StickyScreen} />
         <Stack.Screen name="default" component={Default} />
-        <Stack.Screen name="full" component={FullSheet} />
       </Stack.Navigator>
     </NavigationContainer>
   );

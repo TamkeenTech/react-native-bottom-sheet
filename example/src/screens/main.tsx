@@ -4,17 +4,17 @@ import { Button, Scene } from '../shared';
 
 export const Main = () => {
   const { navigate } = useNavigation();
-  const navToPersistent = useCallback(() => {
-    navigate('default');
+  const navToSticky = useCallback(() => {
+    navigate('sticky');
   }, [navigate]);
-  const navToFullSheet = useCallback(() => {
-    navigate('full');
+  const navToDefault = useCallback(() => {
+    navigate('default');
   }, [navigate]);
 
   return (
     <Scene title="React Native Bottom Sheet">
-      <Button title="Persistant" onPress={navToPersistent} />
-      <Button title="Full Screen" onPress={navToFullSheet} />
+      <Button title="Default" onPress={navToDefault} />
+      <Button title="Sticky Sheet" onPress={navToSticky} />
     </Scene>
   );
 };

@@ -1,217 +1,178 @@
-import React, { FC, useCallback, useState } from 'react';
-import { View } from 'react-native';
-import { PanGestureHandler } from 'react-native-gesture-handler';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import Animated, {
+  interpolate,
   runOnJS,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withSpring,
+  withTiming,
 } from 'react-native-reanimated';
-import { css, DIMENSIONS, STATUSBAR_HEIGHT } from '../constants';
-
 import { DefaultHeader } from '../core';
-
-const BOUNCE_BOTTOM_PADDING = 20;
+import { css, DIMENSIONS } from '../constants';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 
 export interface SheetProps {
-  childOffset?: number;
   offset?: number;
-  onUpdate?: Function;
-  style?: any;
-  contentContainerStyle?: any;
+  dim?: number;
+  show?: boolean;
+  onClose?: Function;
   SheetHeaderComponentStyle?: any;
+  contentContainerStyle?: any;
   SheetHeaderComponent?: any;
   children: Array<Element>;
-  delay?: number;
 }
 
 export const Sheet: FC<SheetProps> = ({
   offset = 0,
-  children,
-  childOffset = 0,
-  contentContainerStyle,
-  style,
-  onUpdate,
+  dim = 0.8,
+  show,
+  onClose: onCloseProps,
   SheetHeaderComponent = DefaultHeader,
+  contentContainerStyle,
   SheetHeaderComponentStyle,
-  delay = 0,
+  children,
 }) => {
+  const [visible, setVisible] = useState(show);
+  const opacity = useSharedValue(show ? 1 : 0);
   const y = useSharedValue(DIMENSIONS.HEIGHT);
-  const [max_height, setMaxHeight] = useState(DIMENSIONS.HEIGHT);
-  const [opened, setOpened] = useState(false);
-  const [header_height, setheaderHeight] = useState(0);
-  const [breakpoints, setBreakPoints] = useState(
-    new Array(children ? children.length : 0).fill(1)
-  );
+  const [translate_y, setTranslateY] = useState(0);
 
-  const open = useCallback(() => {
-    setOpened(true);
-    y.value = withSpring(DIMENSIONS.HEIGHT - max_height, {
-      damping: 13,
-    });
-  }, [max_height, y]);
+  const onClose = useCallback(() => {
+    setVisible(false);
+    onCloseProps && onCloseProps();
+  }, [onCloseProps]);
 
   const close = useCallback(() => {
-    setOpened(false);
-    y.value = withSpring(DIMENSIONS.HEIGHT - breakpoints[0], {
-      damping: 13,
-    });
-  }, [breakpoints, y]);
+    opacity.value = withTiming(0, { duration: 500 }, () => runOnJS(onClose)());
+    y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
+  }, [onClose, opacity, y]);
 
-  const toggleModal = useCallback(() => {
-    opened ? close() : open();
-  }, [close, open, opened]);
+  const open = useCallback(() => {
+    opacity.value = withTiming(1, { duration: 500 });
+    y.value = withTiming(translate_y - offset, { duration: 500 });
+  }, [opacity, translate_y, offset, y]);
 
-  const onChange = useCallback(
-    ({ index, is_end_reached, ...rest }) => {
-      onUpdate && onUpdate({ index, is_end_reached, ...rest });
-      !index && setOpened(false);
-      is_end_reached && setOpened(true);
-    },
-    [onUpdate]
-  );
+  useEffect(() => {
+    show ? setVisible(true) : close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show]);
 
-  const eventHandler = useAnimatedGestureHandler({
-    onStart: (_, ctx: any) => {
-      ctx.startY = y.value;
-    },
-    onActive: (event: any, ctx: any) => {
-      y.value = Math.max(
-        ctx.startY + event.translationY,
-        DIMENSIONS.HEIGHT - max_height - BOUNCE_BOTTOM_PADDING
-      );
-    },
-    onEnd: () => {
-      const needle = Math.round(DIMENSIONS.HEIGHT - y.value);
-      const closest = breakpoints.reduce(
-        (prev, current, index, arr) => {
-          const sub = arr.slice(0, index);
-          const current_height = sub.reduce((p, c) => p + c, 0) + current;
-          return Math.abs(prev.height - needle) <
-            Math.abs(current_height - needle)
-            ? prev
-            : { height: current_height, index };
-        },
-        { index: 0, height: breakpoints[0] }
-      );
-      // RUN SIDE EFFECTS
-      const is_end_reached = closest.index === breakpoints.length - 1;
-      runOnJS(onChange)({
-        index: closest.index,
-        height: closest.height,
-        is_end_reached,
-      });
-      // RUN SIDE EFFECTS
+  useEffect(() => {
+    visible && open();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
-      let new_value = DIMENSIONS.HEIGHT - closest.height;
-      closest.index &&
-        closest.index + 1 !== breakpoints.length &&
-        (new_value -= childOffset);
-      y.value = withSpring(new_value);
-    },
-  });
+  const dim_animated_style = useAnimatedStyle(() => ({
+    opacity: interpolate(opacity.value, [0, 1], [0, dim]),
+  }));
 
-  const onLayout = useCallback(({ nativeEvent }) => {
+  const sheet_animated_style = useAnimatedStyle(() => ({
+    transform: [{ translateY: y.value }],
+  }));
+
+  const _onLayout = useCallback(({ nativeEvent }) => {
     const { height } = nativeEvent.layout;
-    setMaxHeight(height - BOUNCE_BOTTOM_PADDING);
+    setTranslateY(DIMENSIONS.HEIGHT - height);
   }, []);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateY: y.value - STATUSBAR_HEIGHT - header_height - offset },
-      ],
-    };
+  const eventContainerHandler = useAnimatedGestureHandler({
+    onActive: (event: any) => {
+      y.value = Math.max(translate_y + event.translationY, translate_y - 30);
+    },
+    onEnd: (event) => {
+      const { translationY } = event;
+      y.value = withSpring(translate_y);
+      // if (translationY > 20) {
+      //   opacity.value = withTiming(0, { duration: 500 }, () =>
+      //     runOnJS(onClose)()
+      //   );
+      //   y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
+      // }
+    },
   });
 
-  const onChildLayout = useCallback(
-    (index, height) => {
-      /* INIT MODAL */
-      if (!index && breakpoints[index] === 1) {
-        y.value = withDelay(
-          delay,
-          withSpring(Math.round(DIMENSIONS.HEIGHT - height), {
-            damping: 13,
-          })
+  const eventSheetHandler = useAnimatedGestureHandler({
+    onActive: (event: any) => {
+      y.value = Math.max(translate_y + event.translationY, translate_y - 30);
+    },
+    onEnd: (event) => {
+      const { translationY } = event;
+      y.value = withSpring(translate_y);
+      if (translationY > 20) {
+        opacity.value = withTiming(0, { duration: 500 }, () =>
+          runOnJS(onClose)()
         );
+        y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
       }
-      setBreakPoints((prev) =>
-        prev.map((val, i) => (index === i ? height : val))
-      );
     },
-    [breakpoints, y]
-  );
-
-  const onHeaderLayout = useCallback(({ nativeEvent }) => {
-    const { height } = nativeEvent.layout;
-    setheaderHeight(height);
-  }, []);
+  });
 
   return (
-    <PanGestureHandler onGestureEvent={eventHandler}>
-      <Animated.View style={[styles.modal, style, animatedStyle]}>
-        {SheetHeaderComponent ? (
-          <View
-            style={[styles.header, SheetHeaderComponentStyle]}
-            onLayout={onHeaderLayout}
-          >
-            <SheetHeaderComponent toggleModal={toggleModal} opened={opened} />
-          </View>
-        ) : null}
-        <View
-          style={[styles.content, contentContainerStyle]}
-          onLayout={onLayout}
+    <PanGestureHandler onGestureEvent={eventContainerHandler}>
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            transform: [{ translateY: visible ? 0 : DIMENSIONS.HEIGHT }],
+          },
+        ]}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.dim_container}
+          onPress={close}
         >
-          {React.Children.map(children, (child, index) => {
-            return (
-              <Section index={index} onLayout={onChildLayout}>
-                {child}
-              </Section>
-            );
-          })}
-          <View style={styles.bounce_padding} />
-        </View>
+          <Animated.View style={[styles.dim, dim_animated_style]} />
+        </TouchableOpacity>
+        <PanGestureHandler onGestureEvent={eventSheetHandler}>
+          <Animated.View style={[styles.sheet, sheet_animated_style]}>
+            <View onLayout={_onLayout}>
+              <SheetHeaderComponent style={SheetHeaderComponentStyle} />
+              <View style={[styles.content, contentContainerStyle]}>
+                {children}
+              </View>
+            </View>
+            <View style={styles.filler} />
+          </Animated.View>
+        </PanGestureHandler>
       </Animated.View>
     </PanGestureHandler>
   );
 };
 
-const Section: FC<any> = ({ index, onLayout, children }) => {
-  const _onLayout = useCallback(
-    ({ nativeEvent }) => {
-      const { height } = nativeEvent.layout;
-      onLayout(index, height);
-    },
-    [index, onLayout]
-  );
-  return (
-    <View style={styles.section} onLayout={_onLayout}>
-      {children}
-    </View>
-  );
-};
-
 const styles = css({
-  modal: {
+  container: {
     top: 0,
-    position: 'absolute',
-    minHeight: '100%',
     width: '100%',
+    height: '100%',
+    position: 'absolute',
     zIndex: 1,
   },
-  header: {
-    top: 2,
+  dim_container: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  dim: {
+    flex: 1,
+    height: '100%',
+    width: '100%',
+    backgroundColor: '#222222bb',
+  },
+  sheet: {
+    position: 'absolute',
+    width: '100%',
+    bottom: 0,
+    height: '100%',
   },
   content: {
-    backgroundColor: '#FFF',
+    paddingBottom: 20,
+    backgroundColor: 'white',
   },
-  section: {
-    paddingBottom: 15,
-  },
-  bounce_padding: {
-    height: BOUNCE_BOTTOM_PADDING,
+  filler: {
+    flex: 1,
     backgroundColor: 'white',
   },
 });
