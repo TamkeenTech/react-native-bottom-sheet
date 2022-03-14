@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Animated, {
+  Easing,
   interpolate,
   runOnJS,
   useAnimatedGestureHandler,
@@ -45,13 +46,19 @@ export const Sheet: FC<SheetProps> = ({
   }, [onCloseProps]);
 
   const close = useCallback(() => {
-    opacity.value = withTiming(0, { duration: 500 }, () => runOnJS(onClose)());
-    y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
+    opacity.value = withTiming(0, { duration: 300 }, () => runOnJS(onClose)());
+    y.value = withTiming(DIMENSIONS.HEIGHT, {
+      duration: 300,
+      easing: Easing.bezier(0.44, 0.32, 1, 0.76),
+    });
   }, [onClose, opacity, y]);
 
   const open = useCallback(() => {
     opacity.value = withTiming(1, { duration: 500 });
-    y.value = withTiming(translate_y - offset, { duration: 500 });
+    y.value = withTiming(translate_y - offset, {
+      duration: 500,
+      easing: Easing.bezier(0.21, 0.22, 0.35, 1.02),
+    });
   }, [opacity, translate_y, offset, y]);
 
   useEffect(() => {
@@ -77,40 +84,31 @@ export const Sheet: FC<SheetProps> = ({
     setTranslateY(DIMENSIONS.HEIGHT - height);
   }, []);
 
-  const eventContainerHandler = useAnimatedGestureHandler({
+  const containerContainerHandler = useAnimatedGestureHandler({
     onActive: (event: any) => {
       y.value = Math.max(translate_y + event.translationY, translate_y - 30);
     },
-    onEnd: (event) => {
-      const { translationY } = event;
+    onEnd: () => {
       y.value = withSpring(translate_y);
-      // if (translationY > 20) {
-      //   opacity.value = withTiming(0, { duration: 500 }, () =>
-      //     runOnJS(onClose)()
-      //   );
-      //   y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
-      // }
     },
   });
 
-  const eventSheetHandler = useAnimatedGestureHandler({
+  const sheetEventHandler = useAnimatedGestureHandler({
     onActive: (event: any) => {
       y.value = Math.max(translate_y + event.translationY, translate_y - 30);
     },
     onEnd: (event) => {
       const { translationY } = event;
-      y.value = withSpring(translate_y);
       if (translationY > 20) {
-        opacity.value = withTiming(0, { duration: 500 }, () =>
-          runOnJS(onClose)()
-        );
-        y.value = withTiming(DIMENSIONS.HEIGHT, { duration: 500 });
+        runOnJS(close)();
+      } else {
+        y.value = withSpring(translate_y);
       }
     },
   });
 
   return (
-    <PanGestureHandler onGestureEvent={eventContainerHandler}>
+    <PanGestureHandler onGestureEvent={containerContainerHandler}>
       <Animated.View
         style={[
           styles.container,
@@ -126,7 +124,7 @@ export const Sheet: FC<SheetProps> = ({
         >
           <Animated.View style={[styles.dim, dim_animated_style]} />
         </TouchableOpacity>
-        <PanGestureHandler onGestureEvent={eventSheetHandler}>
+        <PanGestureHandler onGestureEvent={sheetEventHandler}>
           <Animated.View style={[styles.sheet, sheet_animated_style]}>
             <View onLayout={_onLayout}>
               <SheetHeaderComponent style={SheetHeaderComponentStyle} />
