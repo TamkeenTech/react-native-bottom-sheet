@@ -19,7 +19,7 @@ A simple react native package for creating and using different kind of modals
 3. Finally, run the command:
 
 ```sh
-   npm install react-native-bottom-sheet
+   npm install @tamkeentech/react-native-bottom-sheet
 ```
 
 ## Usage and Example
