@@ -5,7 +5,7 @@ import { Block, Label, Paragraph } from '../placeholder';
 
 export const Sticky = () => {
   return (
-    <StickySheet delay={800} contentContainerStyle={{ paddingHorizontal: 15 }}>
+    <StickySheet delay={500} contentContainerStyle={{ paddingHorizontal: 15 }}>
       {/* Child 1 */}
       <View>
         <Label />
