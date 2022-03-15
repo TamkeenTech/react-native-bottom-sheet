@@ -18,7 +18,7 @@ const BOUNCE_BOTTOM_PADDING = 20;
 export interface StickySheetProps {
   childOffset?: number;
   offset?: number;
-  onUpdate?: Function;
+  onSnap?: Function;
   style?: any;
   contentContainerStyle?: any;
   SheetHeaderComponentStyle?: any;
@@ -33,7 +33,7 @@ export const StickySheet: FC<StickySheetProps> = ({
   childOffset = 0,
   contentContainerStyle,
   style,
-  onUpdate,
+  onSnap,
   SheetHeaderComponent = DefaultHeader,
   SheetHeaderComponentStyle,
   delay = 0,
@@ -66,11 +66,11 @@ export const StickySheet: FC<StickySheetProps> = ({
 
   const onChange = useCallback(
     ({ index, is_end_reached, ...rest }) => {
-      onUpdate && onUpdate({ index, is_end_reached, ...rest });
+      onSnap && onSnap({ index, is_end_reached, ...rest });
       !index && setOpened(false);
       is_end_reached && setOpened(true);
     },
-    [onUpdate]
+    [onSnap]
   );
 
   const eventHandler = useAnimatedGestureHandler({
