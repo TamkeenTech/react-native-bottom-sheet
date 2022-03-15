@@ -34,7 +34,14 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "bottom",
+    "modal",
+    "sheet",
+    "bottom sheet",
+    "bottom-sheet",
+    "react-native-bottom-sheet",
+    "react native bottom sheet"
   ],
   "repository": "https://github.com/TamkeenTech/react-native-bottom-sheet",
   "author": "Ezziddin <alaa.ezziddin.aae@gmail.com> (https://github.com/Ezziddin)",
