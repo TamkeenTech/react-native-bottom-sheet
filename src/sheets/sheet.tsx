@@ -46,10 +46,10 @@ export const Sheet: FC<SheetProps> = ({
   }, [onCloseProps]);
 
   const close = useCallback(() => {
-    opacity.value = withTiming(0, { duration: 300 }, () => runOnJS(onClose)());
+    opacity.value = withTiming(0, { duration: 400 }, () => runOnJS(onClose)());
     y.value = withTiming(DIMENSIONS.HEIGHT, {
-      duration: 300,
-      easing: Easing.bezier(0.44, 0.32, 1, 0.76),
+      duration: 400,
+      easing: Easing.in(Easing.exp),
     });
   }, [onClose, opacity, y]);
 
@@ -57,7 +57,7 @@ export const Sheet: FC<SheetProps> = ({
     opacity.value = withTiming(1, { duration: 500 });
     y.value = withTiming(translate_y - offset, {
       duration: 500,
-      easing: Easing.bezier(0.21, 0.22, 0.35, 1.02),
+      easing: Easing.out(Easing.exp),
     });
   }, [opacity, translate_y, offset, y]);
 
