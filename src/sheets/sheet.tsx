@@ -23,6 +23,7 @@ export interface SheetProps {
   contentContainerStyle?: any;
   SheetHeaderComponent?: any;
   children: Array<Element>;
+  style?: any;
 }
 
 export const Sheet: FC<SheetProps> = ({
@@ -34,6 +35,7 @@ export const Sheet: FC<SheetProps> = ({
   contentContainerStyle,
   SheetHeaderComponentStyle,
   children,
+  style,
 }) => {
   const [visible, setVisible] = useState(show);
   const opacity = useSharedValue(show ? 1 : 0);
@@ -86,23 +88,29 @@ export const Sheet: FC<SheetProps> = ({
 
   const containerContainerHandler = useAnimatedGestureHandler({
     onActive: (event: any) => {
-      y.value = Math.max(translate_y + event.translationY, translate_y - 30);
+      y.value = Math.max(
+        translate_y + event.translationY - offset,
+        translate_y - offset - 30
+      );
     },
     onEnd: () => {
-      y.value = withSpring(translate_y);
+      y.value = withSpring(translate_y - offset);
     },
   });
 
   const sheetEventHandler = useAnimatedGestureHandler({
     onActive: (event: any) => {
-      y.value = Math.max(translate_y + event.translationY, translate_y - 30);
+      y.value = Math.max(
+        translate_y + event.translationY - offset,
+        translate_y - offset - 30
+      );
     },
     onEnd: (event) => {
       const { translationY } = event;
       if (translationY > 20) {
         runOnJS(close)();
       } else {
-        y.value = withSpring(translate_y);
+        y.value = withSpring(translate_y - offset);
       }
     },
   });
@@ -126,7 +134,7 @@ export const Sheet: FC<SheetProps> = ({
         </TouchableOpacity>
         <PanGestureHandler onGestureEvent={sheetEventHandler}>
           <Animated.View style={[styles.sheet, sheet_animated_style]}>
-            <View onLayout={_onLayout}>
+            <View style={style} onLayout={_onLayout}>
               <SheetHeaderComponent style={SheetHeaderComponentStyle} />
               <View style={[styles.content, contentContainerStyle]}>
                 {children}
