@@ -1,6 +1,6 @@
 {
   "name": "@tamkeentech/react-native-bottom-sheet",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple react native package for creating and using different kind of modals",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
